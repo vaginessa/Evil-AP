@@ -1,13 +1,8 @@
 package com.nibiru.evil_ap;
 
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Pair;
@@ -20,10 +15,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.nibiru.evil_ap.adapters.PagerAdapter;
 import com.nibiru.evil_ap.fragments.ACFragment;
 import com.nibiru.evil_ap.fragments.ClientsFragment;
@@ -31,7 +22,6 @@ import com.nibiru.evil_ap.fragments.MainFragment;
 import com.nibiru.evil_ap.fragments.ServerDetailsFragment;
 import com.nibiru.evil_ap.fragments.ServerItemFragment;
 import com.nibiru.evil_ap.log.Client;
-import com.nibiru.evil_ap.proxy.ProxyService;
 import com.nibiru.evil_ap.ui.CustomViewPager;
 
 import java.util.ArrayList;
@@ -44,21 +34,16 @@ public class MainActivity extends AppCompatActivity implements
         ServerDetailsFragment.OnFragmentInteractionListener, IMVP.RequiredViewOps {
     /**************************************CLASS FIELDS********************************************/
     private final String TAG = getClass().getSimpleName();
-    private ProxyService.IProxyService mProxyService;
-    private boolean psIsBound;
+    //private ProxyService.IProxyService mProxyService;
+    //private boolean psIsBound;
+    //private ServiceConnection mConnection;
     private int selectedTab = 0;
-    private ServiceConnection mConnection;
     // Responsible for maintaining objects state during changing configuration
     private final StateMaintainer mStateMaintainer =
             new StateMaintainer(this.getFragmentManager(), TAG);
     // Presenter operations
     private IMVP.PresenterOps mPresenter;
 
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
 
     /************************************ CLASS METHODS *******************************************/
 
@@ -78,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         mPresenter.checkIfDeviceRooted();
         //start ProxyService and establish connection to it
-        startService(new Intent(this, ProxyService.class));
+        /*startService(new Intent(this, ProxyService.class));
         mConnection = new ServiceConnection() {
             public void onServiceConnected(ComponentName className, IBinder service) {
                 mProxyService = ((ProxyService.IProxyService) service);
@@ -89,20 +74,16 @@ public class MainActivity extends AppCompatActivity implements
                 mProxyService = null;
             }
         };
-        doBindService();
+        doBindService();*/
 
         setUpGUI();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mPresenter = null;
-        doUnbindService();
+        //doUnbindService();
     }
     @Override
     public void onBackPressed() {
@@ -119,12 +100,10 @@ public class MainActivity extends AppCompatActivity implements
                     myFragment2.isVisible())) && selectedTab == 1) {
                 getFragmentManager().popBackStack();
             }
-
         }
-
     }
 
-    private void doBindService() {
+    /*private void doBindService() {
         // Establish a connection with the service.  We use an explicit
         // class name because we want a specific service implementation that
         // we know will be running in our own process (and thus won't be
@@ -139,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements
             unbindService(mConnection);
             psIsBound = false;
         }
-    }
+    }*/
 
     @Override
     public void onFragmentInteraction(Uri uri) {
@@ -330,39 +309,4 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-
-    /****************************************** ??? ***********************************************/
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private Action getIndexApiAction() {
-        Thing object = new Thing.Builder()
-                .setName("Main Page") // TODO: Define a title for the content shown.
-                // TODO: Make sure this auto-generated URL is correct.
-                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
-                .build();
-        return new Action.Builder(Action.TYPE_VIEW)
-                .setObject(object)
-                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-                .build();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        AppIndex.AppIndexApi.start(client, getIndexApiAction());
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        AppIndex.AppIndexApi.end(client, getIndexApiAction());
-        client.disconnect();
-    }
 }

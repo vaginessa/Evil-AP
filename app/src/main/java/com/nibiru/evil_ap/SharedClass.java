@@ -9,6 +9,8 @@ import com.nibiru.evil_ap.log.LogDbHelper;
 import com.nibiru.evil_ap.log.LogEntry;
 import com.nibiru.evil_ap.proxy.InterceptorRequest;
 import com.nibiru.evil_ap.proxy.InterceptorResponse;
+import com.nibiru.evil_ap.proxy.ProxyVpnService;
+import com.nibiru.evil_ap.proxy.SocketFactoryWrapped;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -76,7 +78,7 @@ public class SharedClass {
         mDbManager.cleanDatabase();
         //DatabaseManager.getInstance().closeDatabase();
     }
-    synchronized void setClient(SharedPreferences config){
+    public synchronized void setClient(SharedPreferences config){
         //make client not follow redirects!
         okhttp = new OkHttpClient().newBuilder().followRedirects(false)
                 .connectTimeout(10, TimeUnit.SECONDS)
@@ -110,5 +112,17 @@ public class SharedClass {
     }
     public synchronized int getImgDataLength(){
         return imgData.length;
+    }
+
+    public void setClient(SharedPreferences config, ProxyVpnService proxyVpnService) {
+        //make client not follow redirects!
+        okhttp = new OkHttpClient().newBuilder().followRedirects(false)
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .addInterceptor(new InterceptorRequest())
+                .addInterceptor(new InterceptorResponse(this, config))
+                .followSslRedirects(false)
+                .socketFactory(new SocketFactoryWrapped(proxyVpnService)).build();
     }
 }
